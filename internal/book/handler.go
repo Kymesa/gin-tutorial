@@ -3,11 +3,14 @@ package book
 import (
 	"fmt"
 	"gin-tutorial/config/res"
+
+	// "gin-tutorial/config/validator"
 	"gin-tutorial/internal/database"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 // Handler maneja las peticiones HTTP del recurso "books"
@@ -24,28 +27,26 @@ func NewHandler(repo Repository) *Handler {
 func (h *Handler) CreateBook(context *gin.Context) {
 	var book Book
 
-	// Bind convierte el JSON del body a la estructura Book
-
 	err := context.ShouldBindJSON(&book)
 
 	if err != nil {
-		res.Error(context, http.StatusBadRequest, err.Error())
+		res.Error(context, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
-	if book.Title == "" || book.Author == "" {
-		res.Error(context, http.StatusBadRequest, "Llenar los campos")
+	var validate = validator.New()
+
+	if err := validate.Struct(book); err != nil {
+		err := err.(validator.ValidationErrors)[0]
+		res.Error(context, http.StatusBadRequest, fmt.Sprintf("El campo %v %v", err.Field(), err.Tag()), nil)
 		return
 	}
 
-	// Guardamos el libro
 	if err := h.repo.Create(&book); err != nil {
-
-		res.Error(context, http.StatusBadRequest, "No se pudo crear el libro")
-
+		res.Error(context, http.StatusBadRequest, "No se pudo crear el libro", nil)
 	}
 
-	context.JSON(http.StatusCreated, book)
+	res.Created(context, "Creado con exito", book)
 }
 
 // GetBooks maneja GET /books
@@ -57,7 +58,7 @@ func (h *Handler) GetBooks(c *gin.Context) {
 	fmt.Println(size)
 	booksPage, err := res.Paginate[Book](database.DB, page, size)
 	if err != nil {
-		res.Error(c, http.StatusInternalServerError, "No se pudo obtener libros")
+		res.Error(c, http.StatusInternalServerError, "No se pudo obtener libros", nil)
 		return
 	}
 
