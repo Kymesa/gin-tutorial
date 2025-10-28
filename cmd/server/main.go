@@ -13,7 +13,12 @@ import (
 func main() {
 
 	if err := godotenv.Load(); err != nil {
-		log.Fatal("Error loading .env file")
+
+		if os.Getenv("DEV") == "TRUE" {
+
+			log.Fatal("Error loading .env file")
+		}
+
 	}
 	//  Conectamos a la base de datos PostgreSQL
 	database.ConnectDB()
