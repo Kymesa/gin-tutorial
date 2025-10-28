@@ -15,15 +15,17 @@ var DB *gorm.DB
 // ConnectDB inicializa la conexión a PostgreSQL usando GORM
 func ConnectDB() {
 	// Configuración de conexión — normalmente se obtienen de variables de entorno
-	host := "localhost"
-	port := "5432"
-	user := "keinermesa"
-	password := "backend"
-	dbname := "books_db"
+	// host := "dpg-d404rmjuibrs73b2bn0g-a"
+	// port := "5432"
+	// user := "keinermesa"
+	// password := "pq_uqwb"
+	// dbname := "books_db"
 
 	// Cadena de conexión
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
-		host, user, password, dbname, port)
+	dsn := "postgresql://keinermesa:V5EazhXBUcg2No0MGz0paUHYXWYPh4Fu@dpg-d404rmjuibrs73b2bn0g-a/pq_uqwb"
+
+	//  fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+	// 	host, user, password, dbname, port)
 
 	// Intentamos abrir la conexión
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
