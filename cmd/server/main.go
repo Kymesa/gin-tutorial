@@ -16,11 +16,11 @@ func main() {
 	database.DB.AutoMigrate(&book.Book{})
 
 	// Creamos una nueva instancia del servidor Gin
-	r := gin.Default()
+	app := gin.Default()
 
 	// Registramos las rutas del módulo "book"
-	book.RegisterRoutes(r)
+	book.RegisterRoutes(app)
 
 	// Iniciamos el servidor en el puerto 8080
-	r.Run(":8080")
+	app.Run(":8080")
 }

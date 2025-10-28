@@ -25,6 +25,7 @@ func NewHandler(repo Repository) *Handler {
 
 // CreateBook maneja POST /books
 func (h *Handler) CreateBook(context *gin.Context) {
+
 	var book Book
 
 	err := context.ShouldBindJSON(&book)
@@ -54,8 +55,7 @@ func (h *Handler) GetBooks(c *gin.Context) {
 
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	size, _ := strconv.Atoi(c.DefaultQuery("size", "10"))
-	fmt.Println(page)
-	fmt.Println(size)
+
 	booksPage, err := res.Paginate[Book](database.DB, page, size)
 	if err != nil {
 		res.Error(c, http.StatusInternalServerError, "No se pudo obtener libros", nil)
