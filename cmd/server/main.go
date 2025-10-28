@@ -2,14 +2,20 @@ package main
 
 import (
 	"gin-tutorial/internal/book"
-
 	"gin-tutorial/internal/database"
+	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	// Conectamos a la base de datos PostgreSQL
+
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	//  Conectamos a la base de datos PostgreSQL
 	database.ConnectDB()
 
 	// Migramos el modelo Book (si no existe la tabla, la crea automáticamente)
@@ -21,6 +27,11 @@ func main() {
 	// Registramos las rutas del módulo "book"
 	book.RegisterRoutes(app)
 
-	// Iniciamos el servidor en el puerto 8080
-	app.Run(":8080")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	log.Printf("Escuchando en el puerto %s", port)
+	app.Run(":" + port)
 }

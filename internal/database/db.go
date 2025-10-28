@@ -22,7 +22,14 @@ func ConnectDB() {
 	// dbname := "books_db"
 
 	// Cadena de conexión
-	dsn := "postgresql://keinermesa:V5EazhXBUcg2No0MGz0paUHYXWYPh4Fu@dpg-d404rmjuibrs73b2bn0g-a/pq_uqwb"
+
+	dsn := ""
+
+	if os.Getenv("DEV") == "TRUE" {
+		dsn = os.Getenv("DB_EXTERNAL")
+	} else {
+		dsn = os.Getenv("DB_INTERNAL")
+	}
 
 	//  fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 	// 	host, user, password, dbname, port)
@@ -34,7 +41,7 @@ func ConnectDB() {
 		os.Exit(1)
 	}
 
-	// Guardamos la conexión global
+	//  Guardamos la conexión global
 	DB = db
 	fmt.Println("✅ Conexión a la base de datos exitosa")
 }
