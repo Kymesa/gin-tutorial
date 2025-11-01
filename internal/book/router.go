@@ -1,18 +1,22 @@
 package book
 
-import "github.com/gin-gonic/gin"
+import (
+	"gin-tutorial/config/jwt"
+	
+	"github.com/gin-gonic/gin"
+)
 
-// RegisterRoutes registra las rutas del módulo de libros
-func RegisterRoutes(r *gin.Engine) {
+func RegisterRoutes(router *gin.RouterGroup) {
 	repo := NewRepository()
-	handler := NewHandler(repo)
+	services := NewService(repo)
 
-	books := r.Group("/books")
+	books := router.Group("/books")
+	books.Use(jwt.AuthMiddleware())
 	{
-		books.POST("/", handler.CreateBook)
-		books.GET("/", handler.GetBooks)
-		books.GET("/:id", handler.GetBookByID)
-		books.PUT("/:id", handler.UpdateBook)
-		books.DELETE("/:id", handler.DeleteBook)
+		books.POST("/", services.CreateBook)
+		books.GET("/", services.GetBooks)
+		books.GET("/:id", services.GetBookByID)
+		books.PUT("/:id", services.UpdateBook)
+		books.DELETE("/:id", services.DeleteBook)
 	}
 }

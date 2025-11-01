@@ -1,8 +1,6 @@
 package res
 
 import (
-	"fmt"
-
 	"gorm.io/gorm"
 )
 
@@ -36,9 +34,7 @@ func Paginate[T any](db *gorm.DB, page, pageSize int) (Page[T], error) {
 	db.Model(new(T)).Count(&total)
 
 	// obtener registros
-	err := db.Limit(pageSize).Offset(offset).Find(&items).Error
-
-	fmt.Println(err)
+	err := db.Limit(pageSize).Offset(offset).Order("created_at DESC").Find(&items).Error
 
 	if err != nil {
 		return result, err
