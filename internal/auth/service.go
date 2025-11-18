@@ -17,7 +17,8 @@ import (
 func Test(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
-		"status": http.StatusOK,
+		"status":  http.StatusOK,
+		"message": "Valle Inmuebles",
 	})
 }
 
