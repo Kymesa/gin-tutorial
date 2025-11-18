@@ -3,7 +3,6 @@ package auth
 import (
 	"net/http"
 	"strings"
-	"time"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -73,47 +72,6 @@ func Login(c *gin.Context) {
 		"access_token":  access,
 		"refresh_token": refresh,
 	})
-}
-
-func Refresh(c *gin.Context) {
-	var req struct {
-		RefreshToken string `json:"refresh_token"`
-	}
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos inválidos"})
-		return
-	}
-
-	var token RefreshToken
-	if err := database.DB.Where("token = ? AND revoked = false", req.RefreshToken).First(&token).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Refresh token inválido"})
-		return
-	}
-
-	if time.Now().After(token.ExpiresAt) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Refresh token expirado"})
-		return
-	}
-
-	access, _ := jwt.GenerateJWT(token.UserID)
-
-	newRefresh, exp := jwt.RefreshJWT()
-	token.Revoked = true
-	database.DB.Save(&token)
-	database.DB.Create(RefreshToken{
-		UserID: token.UserID, Token: newRefresh, ExpiresAt: exp,
-	})
-
-	c.JSON(http.StatusOK, gin.H{
-		"access_token":  access,
-		"refresh_token": newRefresh,
-	})
-}
-
-func Logout(c *gin.Context) {
-	userID := c.GetUint("userId")
-	database.DB.Model(RefreshToken{}).Where("user_id = ?", userID).Update("revoked", true)
-	c.JSON(http.StatusOK, gin.H{"message": "Sesión cerrada"})
 }
 
 func AuthMiddleware() gin.HandlerFunc {
