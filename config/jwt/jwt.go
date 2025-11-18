@@ -1,22 +1,23 @@
 package jwt
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 var jwtKey = []byte("@QWERTY@")
 
 type Claims struct {
-	UserID string `json:"userId"`
+	UserID uint `json:"userId"`
 	jwt.RegisteredClaims
 }
 
-func GenerateJWT(userID string) (string, error) {
-	expirationTime := time.Now().Add(24 * time.Hour)
+func GenerateJWT(userID uint) (string, error) {
+	expirationTime := time.Now().Add(15 * time.Minute)
 	claims := &Claims{
 		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -25,6 +26,13 @@ func GenerateJWT(userID string) (string, error) {
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(jwtKey)
+}
+
+func RefreshJWT() (string, time.Time) {
+	exp := time.Now().Add(7 * 24 * time.Hour)
+	token := jwt.New(jwt.SigningMethodHS256)
+	signed, _ := token.SignedString(jwtKey)
+	return signed, exp
 }
 
 func ValidateJWT(tokenString string) (*Claims, error) {

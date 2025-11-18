@@ -3,7 +3,7 @@ package book
 import (
 	"fmt"
 	"gin-tutorial/config/res"
-	// "gin-tutorial/config/validator"
+
 	"gin-tutorial/internal/database"
 	"net/http"
 	"strconv"
@@ -12,17 +12,20 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-// Handler maneja las peticiones HTTP del recurso "books"
-type Handler struct {
-	repo Repository
+type IService interface {
+	DeleteBookService(id uint) error
 }
 
-func NewService(repo Repository) *Handler {
-	return &Handler{repo: repo}
+type BookService struct {
+	repo IRepository
+}
+
+func NewService(repo IRepository) IService {
+	return &BookService{repo: repo}
 }
 
 // CreateBook maneja POST /books
-func (h *Handler) CreateBook(context *gin.Context) {
+func (h *BookService) CreateBook(context *gin.Context) {
 
 	var book Book
 
@@ -49,7 +52,7 @@ func (h *Handler) CreateBook(context *gin.Context) {
 }
 
 // GetBooks maneja GET /books
-func (h *Handler) GetBooks(c *gin.Context) {
+func (h *BookService) GetBooks(c *gin.Context) {
 
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	size, _ := strconv.Atoi(c.DefaultQuery("size", "10"))
@@ -64,7 +67,7 @@ func (h *Handler) GetBooks(c *gin.Context) {
 }
 
 // GetBookByID maneja GET /books/:id
-func (h *Handler) GetBookByID(c *gin.Context) {
+func (h *BookService) GetBookByID(c *gin.Context) {
 
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -83,7 +86,7 @@ func (h *Handler) GetBookByID(c *gin.Context) {
 }
 
 // UpdateBook maneja PUT /books/:id
-func (h *Handler) UpdateBook(c *gin.Context) {
+func (h *BookService) UpdateBook(c *gin.Context) {
 
 	var book Book
 
@@ -120,19 +123,7 @@ func (h *Handler) UpdateBook(c *gin.Context) {
 }
 
 // DeleteBook maneja DELETE /books/:id
-func (h *Handler) DeleteBook(c *gin.Context) {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		res.Error(c, http.StatusInternalServerError, "No se pudo obtenido el id", nil)
-		return
-	}
+func (h *BookService) DeleteBookService(id uint) error {
+	return h.repo.Delete(id)
 
-	_, errById := h.repo.FindByID(uint(id))
-
-	if err := h.repo.Delete(uint(id)); err != nil || errById != nil {
-		res.Error(c, http.StatusInternalServerError, "No se pudo eliminar el libro o no existe", nil)
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Libro eliminado"})
 }

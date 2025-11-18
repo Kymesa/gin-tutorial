@@ -4,8 +4,7 @@ import (
 	"gin-tutorial/internal/database"
 )
 
-// Repository define los métodos CRUD que usará el servicio de libros
-type Repository interface {
+type IRepository interface {
 	Create(book *Book) error
 	FindAll() ([]Book, error)
 	FindByID(id uint) (*Book, error)
@@ -13,11 +12,9 @@ type Repository interface {
 	Delete(id uint) error
 }
 
-// bookRepository es la implementación concreta del repositorio
 type bookRepository struct{}
 
-// NewRepository retorna una nueva instancia del repositorio
-func NewRepository() Repository {
+func NewRepository() IRepository {
 	return &bookRepository{}
 }
 
