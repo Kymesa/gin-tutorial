@@ -14,6 +14,13 @@ import (
 	"gin-tutorial/config/res"
 )
 
+func Test(c *gin.Context) {
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": http.StatusOK,
+	})
+}
+
 func Register(c *gin.Context) {
 	var req struct {
 		Email    string `json:"email"`

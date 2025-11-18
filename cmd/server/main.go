@@ -43,8 +43,9 @@ func main() {
 
 	v1 := app.Group("api/v1")
 	{
-		v1.POST("/register", auth.Register)
+		v1.POST("/", auth.Test)
 		v1.POST("/login", auth.Login)
+		v1.POST("/register", auth.Register)
 
 	}
 
