@@ -5,7 +5,9 @@ import (
 	"gin-tutorial/internal/database"
 	"log"
 	"os"
+	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -26,6 +28,16 @@ func main() {
 	database.DB.AutoMigrate(&auth.User{})
 
 	app := gin.Default()
+
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173", "https://valleinmuebles.vercel.app"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
 	app.Use(gin.Logger())
 	app.Use(gin.Recovery())
 
